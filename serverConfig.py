@@ -27,7 +27,7 @@ class ServerConfiguration:
         if (not self.role) and (not self.admin_role):
             print("No linked roles, will use bot defaults.")
         else:
-            print("Linking roles: Monitor: {0} Admin: {1}".format([self.role],[self.admin_role]))
+            print("Linking roles: Monitor: {0} Admin: {1}".format([self.role], [self.admin_role]))
 
         self.arguments = jsonDict.get('args')
         if self.arguments:

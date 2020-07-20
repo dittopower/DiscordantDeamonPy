@@ -18,7 +18,7 @@ class Server:
             envinfo.dwFlags |= subprocess.CREATE_NEW_CONSOLE
             envinfo.dwFlags |= subprocess.REALTIME_PRIORITY_CLASS
             self.Server = subprocess.Popen(
-                [self.config.launcher,self.config.arguments], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, startupinfo=envinfo)
+                [self.config.launcher, self.config.arguments], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, startupinfo=envinfo)
         return self.statusText()
 
     def statusText(self):
@@ -47,7 +47,7 @@ class Server:
                 except:  # catch *all* exceptions
                     e = sys.exc_info()
                     # print("Error: {0}".format(e[0]))
-                    print (e)
+                    print(e)
                     self.Server.kill()
                     self.Server.wait(15)
             return self.statusText()

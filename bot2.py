@@ -101,7 +101,7 @@ async def on_message(message: discord.Message):
     except:  # catch *all* exceptions
         e = sys.exc_info()
         # print("Error: {0}".format(e[0]))
-        print (e)
+        print(e)
     return
 
 print("Launching Bot...")
