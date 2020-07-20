@@ -1,6 +1,7 @@
 import json
 import typing
 
+
 class config:
     discord_bot_key = 'discord_bot_key'
     admin_users = 'admin_users'
@@ -15,11 +16,11 @@ class config:
     server_role = 'role'
     server_admin_role = 'admin_role'
 
-    def __init__(self,path:str):
-        with open('config.json','r') as file:
+    def __init__(self, path: str):
+        with open('config.json', 'r') as file:
             self.filePath = path
             self.config = json.load(file)
-    
+
     def discordBotKey(self) -> str:
         return self.config[self.discord_bot_key]
 
@@ -34,27 +35,27 @@ class config:
 
     def getServers(self):
         return self.config[self.server_list]
-    
-    def getServer(self,i:int):
+
+    def getServer(self, i: int):
         return self.config[self.server_list][i]
-    
-    def getServerName(self,i:int) -> str:
+
+    def getServerName(self, i: int) -> str:
         return self.config[self.server_list][i][self.server_name]
-    
-    def getServerLauncher(self,i:int) -> str:
+
+    def getServerLauncher(self, i: int) -> str:
         return self.config[self.server_list][i][self.server_launcher]
-    
-    def getServerArguements(self,i:int) -> str:
+
+    def getServerArguements(self, i: int) -> str:
         return self.config[self.server_list][i][self.server_arguments]
-    
-    def getServerStopCmd(self,i:int) -> str:
+
+    def getServerStopCmd(self, i: int) -> str:
         return self.config[self.server_list][i][self.server_stop_command]
-    
-    def getServerSaveCmd(self,i:int) -> str:
+
+    def getServerSaveCmd(self, i: int) -> str:
         return self.config[self.server_list][i][self.server_save_command]
-    
-    def getServerRole(self,i:int) -> str:
+
+    def getServerRole(self, i: int) -> str:
         return self.config[self.server_list][i][self.server_role]
-    
-    def getServerAdminRole(self,i:int) -> str:
+
+    def getServerAdminRole(self, i: int) -> str:
         return self.config[self.server_list][i][self.server_admin_role]
