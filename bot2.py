@@ -1,15 +1,15 @@
 import discord
-import serverClient
 import sys
-import config
+from config import Configuration
+from serverOrchestrator import Server
 
 cmd_prefix: str = '~'
 servers = {}
-cfg = config.config("config.json")
+config = Configuration("config.json")
 
 # create server managers
-for index in range(len(cfg.getServers())):
-    servers[cfg.getServerName(index)] = serverClient.server(cfg.getServerLauncher(index), cfg.getServerArguements(index), cfg.getServerStopCmd(index), cfg.getServerSaveCmd(index))
+for server in config.servers:
+    servers[server.name] = Server(server)
 
 client = discord.Client()
 
@@ -40,7 +40,7 @@ async def on_error(event, *args, **kwargs):
 
 
 def isBotAdmin(user: discord.User):
-    return str(user.id) in cfg.getAdmins()
+    return str(user.id) in config.adminUsers
 
 
 async def shutdown():
@@ -79,29 +79,25 @@ async def on_message(message: discord.Message):
             serverName = serverMsg[0].upper()
             serverCmd = serverMsg[1]
             if serverName in servers:
-                if isBotAdmin(user) or cfg.getServerRole(serverName) in roles or cfg.getServerAdminRole(serverName) in roles:
+                server: Server = servers[serverName]
+                if isBotAdmin(user) or server.config.role in roles or server.config.admin_role in roles:
                     if 'start' in serverCmd:
-                        await message.channel.send(servers[serverName].start())
-                        return
+                        return await message.channel.send(servers[serverName].start())
                     elif 'stop' in serverCmd:
-                        await message.channel.send(servers[serverName].stop())
-                        return
+                        return await message.channel.send(servers[serverName].stop())
                     elif 'status' in serverCmd:
-                        await message.channel.send(servers[serverName].statusText())
-                        return
-                if isBotAdmin(user) or cfg.getServerAdminRole(serverName) in roles:
+                        return await message.channel.send(servers[serverName].statusText())
+                if isBotAdmin(user) or server.config.admin_role in roles:
                     if 'run' in serverCmd:
                         serverCmd = serverCmd.replace("run", "", 1).strip()
-                        await message.channel.send(servers[serverName].cmd(msg))
-                        return
+                        return await message.channel.send(servers[serverName].cmd(msg))
 
             # User Commands
             if msg.startswith('ping'):
-                await message.channel.send('pong!')
-                return
+                return await message.channel.send('pong!')
     except:  # catch *all* exceptions
         e = sys.exc_info()[0]
         print("<p>Error: %s</p>" % e)
     return
 
-client.run(cfg.discordBotKey())
+client.run(config.discordBotKey())

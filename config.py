@@ -1,71 +1,31 @@
 import json
 import typing
+from serverConfig import ServerConfiguration
 
 
-class config:
-    discord_bot_key = 'discord_bot_key'
-    admin_users = 'admin_users'
-    default_server_role = 'default_role'
-    default_server_admin_role = 'default_admin_role'
-    server_list = 'servers'
-    server_name = 'name'
-    server_launcher = 'launcher'
-    server_arguments = 'args'
-    server_stop_command = 'stop'
-    server_save_command = 'save'
-    server_role = 'role'
-    server_admin_role = 'admin_role'
+class Configuration:
 
     def __init__(self, path: str):
         with open('config.json', 'r') as file:
             self.filePath = path
-            self.config = json.load(file)
+            config: dict = json.load(file)
 
-    def __getKeyUpper__(self, key: str):
-        if (self.config[key]):
-            return self.config[key].upper()
-        return None
+        self.discordBotKey = config.get('discord_bot_key')
+        if not self.discordBotKey:
+            raise Exception("Configuration is missing 'discord_bot_key' element", config)
 
-    def __getServerKeyUpper__(self, i: int, key: str):
-        if (self.getServer(i)[key]):
-            return self.getServer(i)[key].upper()
-        return None
+        self.role = config.get('default_role')
+        if self.role:
+            self.role.upper()
+        self.adminRole = config.get('default_admin_role')
+        if self.adminRole:
+            self.adminRole = self.adminRole.upper()
 
-    def discordBotKey(self) -> str:
-        return self.config[self.discord_bot_key]
+        self.adminUsers = config.get('admin_users')
+        if not self.adminUsers:
+            raise Exception("Configuration is missing 'admin_users' element", config)
 
-    def getAdmins(self) -> [str]:
-        return self.config[self.admin_users]
-
-    def defaultRole(self) -> str:
-        return self.__getKeyUpper__(self.default_server_role)
-
-    def defaultAdminRole(self) -> str:
-        return self.__getKeyUpper__(self.default_server_admin_role)
-
-    def getServers(self) -> list:
-        return self.config[self.server_list]
-
-    def getServer(self, i: int):
-        return self.config[self.server_list][i]
-
-    def getServerName(self, i: int) -> str:
-        return self.__getServerKeyUpper__(i, self.server_name)
-
-    def getServerLauncher(self, i: int) -> str:
-        return self.getServer(i)[self.server_launcher]
-
-    def getServerArguements(self, i: int) -> str:
-        return self.getServer(i)[self.server_arguments]
-
-    def getServerStopCmd(self, i: int) -> str:
-        return self.getServer(i)[self.server_stop_command]
-
-    def getServerSaveCmd(self, i: int) -> str:
-        return self.getServer(i)[self.server_save_command]
-
-    def getServerRole(self, i: int) -> str:
-        return self.__getServerKeyUpper__(i, self.server_role) or self.defaultRole()
-
-    def getServerAdminRole(self, i: int) -> str:
-        return self.__getServerKeyUpper__(i, self.server_admin_role) or self.defaultAdminRole()
+        server_list: dict = config.get('servers')
+        self.servers: [ServerConfiguration] = []
+        for server in server_list.values():
+            self.servers.append(ServerConfiguration(server,self))
