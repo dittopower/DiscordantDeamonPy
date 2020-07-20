@@ -1,0 +1,31 @@
+{
+    "discord_bot_key": "discord bot secret",
+    "admin_users": [
+        "user id"
+    ],
+    "default_admin_role": "host",
+    "default_role": "player",
+    "servers": [
+        {
+            "name": "Terraria",
+            "launcher": "D:\\SteamLibrary\\steamapps\\common\\Terraria\\TerrariaServer.exe",
+            "args": "",
+            "stop": "",
+            "save": "",
+            "backup": {
+                "1" : {
+                    "type": "run",
+                    "cmd": ""
+                },
+                "2" : {
+                    "type": "exe",
+                    "cmd": ""
+                },
+                "3" : {
+                    "type": "copy",
+                    "cmd": ""
+                }
+            }
+        }
+    ]
+}
