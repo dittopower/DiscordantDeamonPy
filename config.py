@@ -20,10 +20,15 @@ class config:
         with open('config.json', 'r') as file:
             self.filePath = path
             self.config = json.load(file)
-    
-    def __getKeyUpper__(self,key:str):
+
+    def __getKeyUpper__(self, key: str):
         if (self.config[key]):
             return self.config[key].upper()
+        return None
+
+    def __getServerKeyUpper__(self, i: int, key: str):
+        if (self.getServer(i)[key]):
+            return self.getServer(i)[key].upper()
         return None
 
     def discordBotKey(self) -> str:
@@ -32,8 +37,8 @@ class config:
     def getAdmins(self) -> [str]:
         return self.config[self.admin_users]
 
-    def default_Role(self) -> str:
-        return self.__getKeyUpper__(self.default_Role)
+    def defaultRole(self) -> str:
+        return self.__getKeyUpper__(self.default_server_role)
 
     def defaultAdminRole(self) -> str:
         return self.__getKeyUpper__(self.default_server_admin_role)
@@ -45,22 +50,22 @@ class config:
         return self.config[self.server_list][i]
 
     def getServerName(self, i: int) -> str:
-        return self.__getKeyUpper__(self.server_name)
+        return self.__getServerKeyUpper__(i, self.server_name)
 
     def getServerLauncher(self, i: int) -> str:
-        return self.config[self.server_list][i][self.server_launcher]
+        return self.getServer(i)[self.server_launcher]
 
     def getServerArguements(self, i: int) -> str:
-        return self.config[self.server_list][i][self.server_arguments]
+        return self.getServer(i)[self.server_arguments]
 
     def getServerStopCmd(self, i: int) -> str:
-        return self.config[self.server_list][i][self.server_stop_command]
+        return self.getServer(i)[self.server_stop_command]
 
     def getServerSaveCmd(self, i: int) -> str:
-        return self.config[self.server_list][i][self.server_save_command]
+        return self.getServer(i)[self.server_save_command]
 
     def getServerRole(self, i: int) -> str:
-        return self.__getKeyUpper__(self.server_role)
+        return self.__getServerKeyUpper__(i, self.server_role) or self.defaultRole()
 
     def getServerAdminRole(self, i: int) -> str:
-        return self.__getKeyUpper__(self.server_admin_role)
+        return self.__getServerKeyUpper__(i, self.server_admin_role) or self.defaultAdminRole()
