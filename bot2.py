@@ -77,9 +77,12 @@ async def on_message(message: discord.Message):
             # Server Commands
             serverMsg = msg.split(" ", 1)
             serverName = serverMsg[0].upper()
-            serverCmd = serverMsg[1]
             if serverName in servers:
                 server: Server = servers[serverName]
+                if len(serverMsg) > 1:
+                    serverCmd = serverMsg[1]
+                else:
+                    serverCmd = "status"
                 if isBotAdmin(user) or server.config.role in roles or server.config.admin_role in roles:
                     if 'start' in serverCmd:
                         return await message.channel.send(servers[serverName].start())
@@ -96,8 +99,10 @@ async def on_message(message: discord.Message):
             if msg.startswith('ping'):
                 return await message.channel.send('pong!')
     except:  # catch *all* exceptions
-        e = sys.exc_info()[0]
-        print("<p>Error: %s</p>" % e)
+        e = sys.exc_info()
+        # print("Error: {0}".format(e[0]))
+        print (e)
     return
 
-client.run(config.discordBotKey())
+print("Launching Bot...")
+client.run(config.discordBotKey)

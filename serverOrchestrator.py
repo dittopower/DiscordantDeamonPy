@@ -1,5 +1,6 @@
 import subprocess
 import io
+import sys
 from serverConfig import ServerConfiguration
 
 
@@ -40,7 +41,15 @@ class Server:
             if self.config.cmd_stop:
                 self.Server.communicate(self.config.cmd_stop, 15)
             else:
-                self.Server.kill()
+                try:
+                    self.Server.terminate()
+                    self.Server.wait(15)
+                except:  # catch *all* exceptions
+                    e = sys.exc_info()
+                    # print("Error: {0}".format(e[0]))
+                    print (e)
+                    self.Server.kill()
+                    self.Server.wait(15)
             return self.statusText()
         else:
             return "It's already stopped!"

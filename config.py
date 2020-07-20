@@ -25,7 +25,7 @@ class Configuration:
         if not self.adminUsers:
             raise Exception("Configuration is missing 'admin_users' element", config)
 
-        server_list: dict = config.get('servers')
+        server_list: [] = config.get('servers')
         self.servers: [ServerConfiguration] = []
-        for server in server_list.values():
-            self.servers.append(ServerConfiguration(server,self))
+        for server in server_list:
+            self.servers.append(ServerConfiguration(server))

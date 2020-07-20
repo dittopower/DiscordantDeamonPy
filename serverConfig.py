@@ -1,11 +1,10 @@
 import json
 import typing
-from config import Configuration
 
 
 class ServerConfiguration:
 
-    def __init__(self, jsonDict: dict, config: config.Configuration):
+    def __init__(self, jsonDict: dict):
         self.name = jsonDict.get('name')
         if self.name:
             self.name = self.name.upper()
@@ -26,10 +25,7 @@ class ServerConfiguration:
         if self.admin_role:
             self.admin_role = self.admin_role.upper()
         if (not self.role) and (not self.admin_role):
-            if (not config.role) and (not config.admin_role):
-                print("No linked roles, only the bot's admins can use this server")
-            else:
-                print("Linking default roles: Monitor: {0} Admin: {1}".format([config.role],[config.admin_role]))
+            print("No linked roles, will use bot defaults.")
         else:
             print("Linking roles: Monitor: {0} Admin: {1}".format([self.role],[self.admin_role]))
 
