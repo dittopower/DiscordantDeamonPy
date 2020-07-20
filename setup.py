@@ -7,5 +7,5 @@ setup(
    author='Deamon',
    author_email='dev@deamon.info',
    packages=[],
-   install_requires=['discord'], #external packages as dependencies
+   install_requires=['discord.py'], #external packages as dependencies
 )
