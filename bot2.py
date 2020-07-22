@@ -2,10 +2,12 @@ import discord
 import sys
 from config import Configuration
 from serverOrchestrator import Server
+from voting.democraticPoll import democraticPoll
 
 cmd_prefix: str = '~'
 servers = {}
 config = Configuration("config.json")
+polls = {}
 
 # create server managers
 for server in config.servers:
@@ -98,6 +100,58 @@ async def on_message(message: discord.Message):
             # User Commands
             if msg.startswith('ping'):
                 return await message.channel.send('pong!')
+            if msg.startswith('help'):
+                return await message.channel.send('Not today...')
+            if msg.startswith("multivote"):
+                multivote = True
+                msg = msg.replace("multivote", "vote", 1)
+            else:
+                multivote = False
+            if msg.startswith('vote'):
+                msg = msg.replace("vote", "", 1).strip()
+                cmd = msg.split(" ", 1)
+                if cmd[0].lower() == "new":
+                    for i in polls:
+                        poll: democraticPoll = polls[i]
+                        if poll.question.lower() == cmd[1].lower():
+                            return await message.channel.send('Poll already exists!')
+                    poll = democraticPoll(user, cmd[1], multivote)
+                    poll.id = len(polls)
+                    while polls.get(poll.id):
+                        poll.id += 1
+                    polls[poll.id] = poll
+                    return await message.channel.send('Poll created: %{0.id} {0.question}'.format(poll))
+                if cmd[0].startswith("%"):
+                    cmd[0] = cmd[0].replace("%", "")
+                if cmd[0].isnumeric():
+                    poll = polls.get(int(cmd[0]))
+                    if not poll:
+                        return await message.channel.send('Unknown Poll ID!')
+                    cmd = cmd[1].split(" ", 1)
+                    cmd[0] = cmd[0].lower()
+                    if cmd[0].startswith("add"):
+                        if poll.addOption(user, cmd[1]):
+                            return await message.channel.send('Added option {1} to %{0.id} {0.question}'.format(poll, cmd[1]))
+                        else:
+                            return await message.channel.send("Couldn't add option {1} to %{0.id} {0.question}. The poll may not allow editing.".format(poll, cmd[1]))
+                    if cmd[0].isnumeric():
+                        return await poll.vote(user,int(cmd[0]))
+                    if cmd[0].startswith("status"):
+                        return await message.channel.send(poll.status())
+                    if cmd[0].startswith("list"):
+                        return await message.channel.send("Poll %{0.id} {0.question}:\n".format(poll) + poll.listOptions())
+                    if cmd[0].startswith("results") or cmd[0].startswith("tally"):
+                        return await message.channel.send(poll.listOptions(True))
+                    if isBotAdmin(user) or user.permissions_in(message.channel).administrator or user is poll.owner:
+                        if cmd[0].startswith("delete"):
+                            polls.pop(poll.id)
+                            return await message.channel.send('Poll deleted: %{0.id} {0.question}'.format(poll))
+                        if cmd[0].startswith("start") or cmd[0].startswith("restart"):
+                            poll.start()
+                            return await message.channel.send('Poll: %{0.id} {0.question}\n{1}\n----\nPlease vote now: msg me "~vote %{0.id} your_options_number"'.format(poll, poll.listOptions()))
+                        if cmd[0].startswith("finish") or cmd[0].startswith("end"):
+                            return await message.channel.send(poll.finish())
+
     except:  # catch *all* exceptions
         e = sys.exc_info()
         # print("Error: {0}".format(e[0]))
