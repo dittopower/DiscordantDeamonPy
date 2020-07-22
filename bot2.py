@@ -110,17 +110,25 @@ async def on_message(message: discord.Message):
             if msg.startswith('vote'):
                 msg = msg.replace("vote", "", 1).strip()
                 cmd = msg.split(" ", 1)
-                if cmd[0].lower() == "new":
+                cmd[0] = cmd[0].lower()
+                if cmd[0].startswith("new") or cmd[0].startswith("create"):
                     for i in polls:
                         poll: democraticPoll = polls[i]
                         if poll.question.lower() == cmd[1].lower():
-                            return await message.channel.send('Poll already exists!')
+                            return await message.channel.send('Poll already exists! ||%{0.id}|| "{0.question}"'.format(poll))
                     poll = democraticPoll(user, cmd[1], multivote)
                     poll.id = len(polls)
                     while polls.get(poll.id):
                         poll.id += 1
                     polls[poll.id] = poll
-                    return await message.channel.send('Poll created: %{0.id} {0.question}'.format(poll))
+                    return await message.channel.send('Poll created: ||%{0.id}|| {0.question}'.format(poll))
+                if cmd[0].startswith("history"):
+                    output = "Historical Polls:"
+                    output+= "\n-----------------"
+                    for poll in polls.values():
+                        output += "\n\|\| ||%{0.id}|| \|\| {0.question}".format(poll)
+                    output+= "\n-----------------"
+                    return await message.channel.send(output)
                 if cmd[0].startswith("%"):
                     cmd[0] = cmd[0].replace("%", "")
                 if cmd[0].isnumeric():
@@ -131,24 +139,31 @@ async def on_message(message: discord.Message):
                     cmd[0] = cmd[0].lower()
                     if cmd[0].startswith("add"):
                         if poll.addOption(user, cmd[1]):
-                            return await message.channel.send('Added option {1} to %{0.id} {0.question}'.format(poll, cmd[1]))
+                            return await message.channel.send('Added option {1} to ||%{0.id}|| {0.question}'.format(poll, cmd[1]))
                         else:
-                            return await message.channel.send("Couldn't add option {1} to %{0.id} {0.question}. The poll may not allow editing.".format(poll, cmd[1]))
+                            return await message.channel.send("Couldn't add option {1} to ||%{0.id}|| {0.question}. The poll may not allow editing.".format(poll, cmd[1]))
                     if cmd[0].isnumeric():
                         return await poll.vote(user,int(cmd[0]))
                     if cmd[0].startswith("status"):
                         return await message.channel.send(poll.status())
                     if cmd[0].startswith("list"):
-                        return await message.channel.send("Poll %{0.id} {0.question}:\n".format(poll) + poll.listOptions())
+                        return await message.channel.send("Poll ||%{0.id}|| {0.question}:\n".format(poll) + poll.listOptions())
                     if cmd[0].startswith("results") or cmd[0].startswith("tally"):
-                        return await message.channel.send(poll.listOptions(True))
+                        return await message.channel.send("Poll ||%{0.id}|| {0.question}:\n{1}".format(poll,poll.listOptions(True)))
+                    if cmd[0].startswith("redo"):
+                        poll = poll.redo(user)
+                        poll.id = len(polls)
+                        while polls.get(poll.id):
+                            poll.id += 1
+                        polls[poll.id] = poll
+                        return await message.channel.send('Recreated: {0}\n{1}'.format(poll.status(),poll.listOptions()))
                     if isBotAdmin(user) or user.permissions_in(message.channel).administrator or user is poll.owner:
                         if cmd[0].startswith("delete"):
                             polls.pop(poll.id)
-                            return await message.channel.send('Poll deleted: %{0.id} {0.question}'.format(poll))
+                            return await message.channel.send('Poll deleted: ||%{0.id}|| {0.question}'.format(poll))
                         if cmd[0].startswith("start") or cmd[0].startswith("restart"):
                             poll.start()
-                            return await message.channel.send('Poll: %{0.id} {0.question}\n{1}\n----\nPlease vote now: msg me "~vote %{0.id} your_options_number"'.format(poll, poll.listOptions()))
+                            return await message.channel.send('Poll: ||%{0.id}|| {0.question}\n{1}\n----\nPlease vote now: msg me "~vote ||%{0.id}|| your_options_number"'.format(poll, poll.listOptions()))
                         if cmd[0].startswith("finish") or cmd[0].startswith("end"):
                             return await message.channel.send(poll.finish())
 

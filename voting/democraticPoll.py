@@ -1,5 +1,6 @@
 import discord
 from voting.voteOption import voteOption
+import copy
 
 
 class democraticPoll:
@@ -16,6 +17,13 @@ class democraticPoll:
         self.multivote = multivote
         self.locked = locked
 
+    def redo(self, recreator: discord.User):
+        poll = democraticPoll(recreator,self.question,self.multivote,self.locked)
+        for opt in self.options:
+            poll.options.append(voteOption(recreator, opt.option))
+        poll.start()
+        return poll
+
     def addOption(self, author: discord.User, option: str) -> bool:
         return self.addOption2(voteOption(author, option))
 
@@ -25,7 +33,7 @@ class democraticPoll:
         else:
             self.options.append(option)
             return True
-    
+
     def start(self):
         self.open = True
         self.votes = {}
@@ -42,7 +50,7 @@ class democraticPoll:
             else:
                 for voter in self.votes:
                     self.options[self.votes[voter]].count += 1
-        results = "Results: %{0.id} {0.question}:\n{1}".format(self,self.listOptions(True))
+        results = "Results: %{0.id} {0.question}:\n{1}".format(self, self.listOptions(True))
         return results
 
     def listOptions(self, includeResults=False) -> str:
@@ -55,7 +63,7 @@ class democraticPoll:
         return "\n".join(res)
 
     def status(self) -> str:
-        out = "The poll {0.question}:".format(self)
+        out = "The poll %{0.id} {0.question}:".format(self)
         if self.locked:
             out += "\n- is editable"
         if self.multivote:
