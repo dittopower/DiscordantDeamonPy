@@ -166,6 +166,7 @@ async def on_message(message: discord.Message):
                             return await message.channel.send('Poll: ||%{0.id}|| {0.question}\n{1}\n----\nPlease vote now: msg me "~vote ||%{0.id}|| your_options_number"'.format(poll, poll.listOptions()))
                         if cmd[0].startswith("finish") or cmd[0].startswith("end"):
                             return await message.channel.send(poll.finish())
+                return await message.channel.send('Looks like your vote command was incomplete or invalid! "{0}"'.format(message.content))
 
     except:  # catch *all* exceptions
         e = sys.exc_info()
