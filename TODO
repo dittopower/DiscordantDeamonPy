@@ -1,0 +1,8 @@
+- Bot logs
+- Server logs
+- Server log output to chat
+- Voting per server/guild/channel isolation
+- Voting persistence i.e. sqlite
+- In bot help
+- Tic-Tac-toe
+- natural language processing
