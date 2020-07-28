@@ -13,7 +13,10 @@ setup(
     #     ]
     # },
     packages=find_packages(),
-    install_requires=['discord.py'],
+    install_requires=[
+        'discord.py',
+        'tinydb',
+    ],
     # package_data={
     #     "": ["*.py", "*.json"]
     # },

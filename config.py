@@ -14,6 +14,10 @@ class Configuration:
         if not self.discordBotKey:
             raise Exception("Configuration is missing 'discord_bot_key' element", config)
 
+        self.databaseFile = config.get('database_file')
+        if not self.databaseFile:
+            raise Exception("Configuration is missing 'database_file' element", config)
+
         self.role = config.get('default_role')
         if self.role:
             self.role.upper()

@@ -1,5 +1,6 @@
 import discord
 import sys
+import tinydb
 from config import Configuration
 from serverOrchestrator import Server
 from voting.democraticPoll import democraticPoll
@@ -7,6 +8,7 @@ from voting.democraticPoll import democraticPoll
 cmd_prefix: str = '~'
 servers = {}
 config = Configuration("config.json")
+db = tinydb.TinyDB(config.databaseFile)
 polls = {}
 
 # create server managers
