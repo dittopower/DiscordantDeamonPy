@@ -126,7 +126,7 @@ class Poll:
             # TODO: throw error
             False
 
-    async def vote(self, voter: int, optionIndex: int):
+    def vote(self, voter: int, optionIndex: int):
         if not self._finished:
             if optionIndex <= len(self._options):
                 if self._multivote:
@@ -143,7 +143,7 @@ class Poll:
             # TODO: throw error
             False
 
-    async def unvote(self, voter: int, optionIndex: int):
+    def unvote(self, voter: int, optionIndex: int):
         if not self._finished:
             if optionIndex <= len(self._options):
                 if self._multivote:
