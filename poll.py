@@ -6,11 +6,11 @@ import copy
 class Poll:
 
     def __init__(self, author: int, question: str, multivote=False, editable=False, publicVotes=False, publicAuthors=False, voteable=False, opts: [str] = []):
-        self._author = author
-        self._question = question
+        self.author = author
+        self.question = question
         self._options = []
         for o in opts:
-            self._options.append(pollOption.Option(author, opts[o]))
+            self._options.append(pollOption.Option([author], opts[o]))
         self._multivote = multivote
         self._editable = editable
         self._voteable = voteable
@@ -19,9 +19,21 @@ class Poll:
         self._finished = False
         self._votes = {}
 
+    def getDataObject(self) -> dict:
+        dicti = self.__dict__
+        for i in range(len(dicti['_options'])):
+            dicti['_options'][i] = dicti['_options'][i].__dict__
+        return dicti
+    def setDataObject(self, dicti) -> dict:
+        for i in range(len(dicti['_options'])):
+            opt = pollOption.Option([-1],"Null")
+            opt.__dict__ = dicti['_options'][i]
+            dicti['_options'][i] = opt
+        self.__dict__ = dicti
+
     def redo(self, author: int):
         poll = copy.copy(self)
-        poll._author = author
+        poll.author = author
         return poll
 
     def start(self):
@@ -45,16 +57,16 @@ class Poll:
                     totals[vote] += 1
         else:
             for vote in self._votes.values():
-                totals[vote] += 1
+                totals[vote-1] += 1
         return totals
 
     def finish(self):
-        if self._finished:
+        if not self._finished:
             self._finished = True
         return "{0.question}:\n{1}".format(self, self.listOptions(True))
 
     def status(self) -> str:
-        out = "The poll %{0.id} {0.question}:".format(self)
+        out = "The poll {0.question}:".format(self)
         if self._editable:
             out += "\n✅ is editable"
         if self._multivote:
@@ -69,7 +81,7 @@ class Poll:
 
     def setQuestion(self, question: str):
         if self._editable:
-            self._question = question
+            self.question = question
         else:
             # TODO: error
             False
@@ -94,7 +106,7 @@ class Poll:
 
     def addOption(self, author: int, option: str) -> bool:
         if self._editable:
-            self._options.append(pollOption.Option(author, option))
+            self._options.append(pollOption.Option([author], option))
             return True
         else:
             # TODO: throw error

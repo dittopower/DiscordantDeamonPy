@@ -4,10 +4,12 @@ import tinydb
 from config import Configuration
 from serverOrchestrator import Server
 from voting.democraticPoll import democraticPoll
+from auth import AuthManager
 
 cmd_prefix: str = '~'
 servers = {}
 config = Configuration("config.json")
+auth = AuthManager(config)
 db = tinydb.TinyDB(config.databaseFile)
 polls = {}
 
@@ -43,10 +45,6 @@ async def on_error(event, *args, **kwargs):
     print('[Error] {0} [{1[0].guild}][{1[0].channel}]: {1} - {2}'.format(event, args, kwargs))
 
 
-def isBotAdmin(user: discord.User):
-    return str(user.id) in config.adminUsers
-
-
 async def shutdown():
     for server in servers.values():
         server.stop()
@@ -67,7 +65,7 @@ async def on_message(message: discord.Message):
 
             # Bot Admin Commands
             # TODO: Config file
-            if isBotAdmin(user):
+            if auth.isBotAdmin(user.id):
                 if msg.startswith('shutdown'):
                     return await shutdown()
 
@@ -87,14 +85,14 @@ async def on_message(message: discord.Message):
                     serverCmd = serverMsg[1]
                 else:
                     serverCmd = "status"
-                if isBotAdmin(user) or server.config.role in roles or server.config.admin_role in roles:
+                if auth.isBotAdmin(user.id) or server.config.role in roles or server.config.admin_role in roles:
                     if 'start' in serverCmd:
                         return await message.channel.send(servers[serverName].start())
                     elif 'stop' in serverCmd:
                         return await message.channel.send(servers[serverName].stop())
                     elif 'status' in serverCmd:
                         return await message.channel.send(servers[serverName].statusText())
-                if isBotAdmin(user) or server.config.admin_role in roles:
+                if auth.isBotAdmin(user.id) or server.config.admin_role in roles:
                     if 'run' in serverCmd:
                         serverCmd = serverCmd.replace("run", "", 1).strip()
                         return await message.channel.send(servers[serverName].cmd(msg))
@@ -159,7 +157,7 @@ async def on_message(message: discord.Message):
                             poll.id += 1
                         polls[poll.id] = poll
                         return await message.channel.send('Recreated: {0}\n{1}'.format(poll.status(),poll.listOptions()))
-                    if isBotAdmin(user) or user.permissions_in(message.channel).administrator or user is poll.owner:
+                    if auth.isBotAdmin(user.id) or user.permissions_in(message.channel).administrator or user is poll.owner:
                         if cmd[0].startswith("delete"):
                             polls.pop(poll.id)
                             return await message.channel.send('Poll deleted: ||%{0.id}|| {0.question}'.format(poll))

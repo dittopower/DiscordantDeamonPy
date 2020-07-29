@@ -5,6 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: debug test file",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/testing.py",
+            "console": "integratedTerminal",
+            "env": {
+                "NLTK_DATA": "C:\\nltk_data"
+            }
+        },
+        {
             "name": "Python: DeamonBot",
             "type": "python",
             "request": "launch",
